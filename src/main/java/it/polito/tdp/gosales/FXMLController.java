@@ -1,9 +1,14 @@
 package it.polito.tdp.gosales;
 
 import java.net.URL;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 import it.polito.tdp.gosales.model.Model;
+import it.polito.tdp.gosales.model.Retailers;
+import it.polito.tdp.gosales.model.Volume;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -31,10 +36,10 @@ public class FXMLController {
     private Button btnVolumi;
 
     @FXML
-    private ComboBox<?> cmbAnno;
+    private ComboBox<Integer> cmbAnno;
 
     @FXML
-    private ComboBox<?> cmbNazione;
+    private ComboBox<String> cmbNazione;
     
     @FXML
     private TextField txtN;
@@ -44,17 +49,50 @@ public class FXMLController {
 
     @FXML
     void doCalcolaVolumi(ActionEvent event) {
-
+    	List<Volume> volumi = model.calcolaVolume();
+    	
+    	for (Volume v: volumi) {
+    		txtResult.appendText(v+"\n");
+    	}
     }
 
     @FXML
     void doCreaGrafo(ActionEvent event) {
+    	String nazione = cmbNazione.getValue();
+    	if (nazione.compareTo("")==0) {
+    		txtResult.setText("Seleziona una nazione");
+    		return;
+    	}
+    	int anno = cmbAnno.getValue();
+    	if (anno == 0) {
+    		txtResult.setText("Seleziona un anno");
+    		return;
+    	}
+    	model.creaGrafo(nazione, anno);
+    	txtResult.appendText("#Vertici: "+ model.getV()+"\n");
+    	txtResult.appendText("#Archi: "+ model.getA()+"\n");
 
     }
 
     @FXML
     void doRicorsione(ActionEvent event) {
-
+    	String input = txtN.getText();
+    	if (input.compareTo("")==0) {
+    		txtResult.setText("Inserisci un numero");
+    		return;
+    	}
+    	int n =0;
+    	try {
+    		n = Integer.parseInt(input);
+    	}catch(NumberFormatException e ) {
+    		txtResult.setText("Inserisci un numero intero");
+    		return;
+    	}
+    	if (n<2) {
+    		txtResult.setText("Il numero deve essere maggiore o uguale a 2");
+    		return;
+    	}
+    	
     }
 
     @FXML
@@ -72,6 +110,11 @@ public class FXMLController {
     
     public void setModel(Model model) {
     	this.model = model;
+    	cmbAnno.getItems().add(2015);
+    	cmbAnno.getItems().add(2016);
+    	cmbAnno.getItems().add(2017);
+    	cmbAnno.getItems().add(2018);
+    	cmbNazione.getItems().addAll(model.getNazioni());
     }
 
 }
